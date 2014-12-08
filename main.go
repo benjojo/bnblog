@@ -58,7 +58,7 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 	postd, _ := base64.StdEncoding.DecodeString(post.Content)
 	// post.Content = strings.Replace(string(postd), "\n", "\r\n\r\n", -1)
 	post.Content = string(postd)
-	output := blackfriday.MarkdownBasic([]byte(post.Content))
+	output := blackfriday.MarkdownCommon([]byte(post.Content))
 	lines := strings.Split(string(postd), "\n")
 	layoutData := struct {
 		Title   string

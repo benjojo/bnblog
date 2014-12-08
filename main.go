@@ -23,6 +23,14 @@ type Post struct {
 	Title   string
 }
 
+type PostFormatted struct {
+	Author  string
+	Content string `datastore:",noindex"`
+	Date    string
+	Slug    string
+	Title   string
+}
+
 func init() {
 	m := martini.Classic()
 	m.Get("/post/:name", ReadPost)
@@ -68,18 +76,32 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 
 func ListPosts(rw http.ResponseWriter, req *http.Request) {
 	c := appengine.NewContext(req)
-	q := datastore.NewQuery("Post").Order("-Date").Limit(10)
-	posts := make([]Post, 0, 10)
+	q := datastore.NewQuery("Post").Order("-Date").Limit(100)
+	posts := make([]Post, 0, 100)
 
 	if _, err := q.GetAll(c, &posts); err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	FormattedPosts := make([]PostFormatted, 0)
+
+	for _, v := range posts {
+		if !strings.HasPrefix(v.Slug, "DRAFT-") {
+			newpost := PostFormatted{
+				Author:  v.Author,
+				Content: v.Content,
+				Date:    v.Date.Format("2006-01-02 15:04:05"),
+				Slug:    v.Slug,
+				Title:   v.Title,
+			}
+			FormattedPosts = append(FormattedPosts, newpost)
+		}
+	}
 
 	layoutData := struct {
-		Posts []Post
+		Posts []PostFormatted
 	}{
-		Posts: posts,
+		Posts: FormattedPosts,
 	}
 
 	err := HomeTemplate.Execute(rw, layoutData)

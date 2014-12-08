@@ -28,3 +28,5 @@ a:visited { color:#828282; text-decoration:none; }
 
 pre { overflow: auto; padding: 2px; max-width:600px; }
 pre:hover {overflow:auto}
+
+code { background: #333; }

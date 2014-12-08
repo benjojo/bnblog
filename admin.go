@@ -4,6 +4,7 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"appengine/user"
+	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 	"github.com/codegangsta/martini"
@@ -27,21 +28,26 @@ func PublishPost(rw http.ResponseWriter, req *http.Request, params martini.Param
 	}
 
 	req.ParseForm()
+	postslug := req.PostFormValue("slug")
+	if postslug == "" {
+		postslug = fmt.Sprintf("DRAFT-%s", RandString(10))
+	}
 
-	k := datastore.NewKey(c, "Post", req.PostFormValue("slug"), 0, nil)
+	k := datastore.NewKey(c, "Post", postslug, 0, nil)
 
 	NP := Post{
 		Author:  "Benjojo",
 		Content: base64.StdEncoding.EncodeToString([]byte(req.PostFormValue("post"))),
 		Date:    time.Now(),
-		Slug:    req.PostFormValue("slug"),
+		Slug:    postslug,
 		Title:   strings.Split(req.PostFormValue("post"), "\n")[0],
 	}
 	_, err := datastore.Put(c, k, &NP)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 	} else {
-		http.Error(rw, "done", http.StatusCreated)
+
+		http.Error(rw, fmt.Sprintf("/post/%s", postslug), http.StatusCreated)
 	}
 	return
 }
@@ -52,4 +58,14 @@ func Admin(rw http.ResponseWriter, req *http.Request, params martini.Params) {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 	}
 	rw.Write(b)
+}
+
+func RandString(n int) string {
+	const alphanum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	var bytes = make([]byte, n)
+	rand.Read(bytes)
+	for i, b := range bytes {
+		bytes[i] = alphanum[b%byte(len(alphanum))]
+	}
+	return string(bytes)
 }

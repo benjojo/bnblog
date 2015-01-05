@@ -4,6 +4,7 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"encoding/base64"
+	"fmt"
 	"github.com/codegangsta/martini"
 	"github.com/russross/blackfriday"
 	"net/http"
@@ -41,7 +42,15 @@ func init() {
 	m.Get("/admin/run_gc", Run_GC)
 	m.Get("/admin/remove/:name", RemovePost)
 
+	m.Get("/lessons/:year/:month/:day/:title", MigrateOldURLS)
+	m.Get("/lessons/:year/:month/:day/:title/", MigrateOldURLS)
+	m.Get("/errors/:year/:month/:day/:title", MigrateOldURLS)
+	m.Get("/errors/:year/:month/:day/:title/", MigrateOldURLS)
 	http.Handle("/", m)
+}
+
+func MigrateOldURLS(rw http.ResponseWriter, req *http.Request, params martini.Params) {
+	http.Redirect(rw, req, fmt.Sprintf("https://blog.benjojo.co.uk/post/%s-%s-%s-%s.md", params["year"], params["month"], params["day"], params["title"]), http.StatusMovedPermanently)
 }
 
 func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) {

@@ -38,6 +38,9 @@ func init() {
 	m.Get("/admin/", Admin)
 	m.Get("/", ListPosts)
 	m.Get("/all", ListPosts)
+	m.Get("/admin/run_gc", Run_GC)
+	m.Get("/admin/remove/:name", RemovePost)
+
 	http.Handle("/", m)
 }
 

@@ -46,6 +46,12 @@ func init() {
 	m.Get("/lessons/:year/:month/:day/:title/", MigrateOldURLS)
 	m.Get("/errors/:year/:month/:day/:title", MigrateOldURLS)
 	m.Get("/errors/:year/:month/:day/:title/", MigrateOldURLS)
+
+	m.Use(func(res http.ResponseWriter, req *http.Request) {
+		res.Header().Add("Cache-Control", "public")
+		res.Header().Add("X-Powered-By", "uW0t-m8")
+	})
+
 	http.Handle("/", m)
 }
 

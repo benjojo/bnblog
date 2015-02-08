@@ -46,6 +46,8 @@ func init() {
 	m.Get("/lessons/:year/:month/:day/:title/", MigrateOldURLS)
 	m.Get("/errors/:year/:month/:day/:title", MigrateOldURLS)
 	m.Get("/errors/:year/:month/:day/:title/", MigrateOldURLS)
+	m.Get("/posts/errors/:year/:month/:day/:title", MigrateOldURLS)
+	m.Get("/posts/errors/:year/:month/:day/:title/", MigrateOldURLS)
 
 	m.Use(func(res http.ResponseWriter, req *http.Request) {
 		res.Header().Add("Cache-Control", "public")

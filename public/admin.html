@@ -48,6 +48,19 @@
 <input type="text" name="date" value="{{.Date}}"/><br>
 <input type="submit" value="Publish">
 </form>
+
+<br>
+<br>
+<br>
+
+<h1>Upload files!!!</h1>
+
+<form action="/admin/uploadfile" method="post" enctype="multipart/form-data">
+    Select thing to upload:
+    <input type="file" name="fileToUpload" id="fileToUpload">
+    <input type="submit" value="Upload Image" name="submit">
+</form>
+
                     <tr>
                         <td colspan="2"></td>
 

@@ -41,6 +41,7 @@ func init() {
 	m.Get("/all", ListPosts)
 	m.Get("/admin/run_gc", Run_GC)
 	m.Get("/admin/remove/:name", RemovePost)
+	m.Post("/admin/uploadfile", UploadFile)
 
 	m.Get("/lessons/:year/:month/:day/:title", MigrateOldURLS)
 	m.Get("/lessons/:year/:month/:day/:title/", MigrateOldURLS)
@@ -48,6 +49,7 @@ func init() {
 	m.Get("/errors/:year/:month/:day/:title/", MigrateOldURLS)
 	m.Get("/posts/errors/:year/:month/:day/:title", MigrateOldURLS)
 	m.Get("/posts/errors/:year/:month/:day/:title/", MigrateOldURLS)
+	m.Get("/asset/:tag", ReadFile)
 
 	m.Use(func(res http.ResponseWriter, req *http.Request) {
 		res.Header().Add("Cache-Control", "public")

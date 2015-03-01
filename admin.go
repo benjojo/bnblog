@@ -60,6 +60,11 @@ func PublishPost(rw http.ResponseWriter, req *http.Request, params martini.Param
 	return
 }
 
+func GibContextPls(req *http.Request) appengine.Context {
+	c := appengine.NewContext(req)
+	return c
+}
+
 func RemovePost(rw http.ResponseWriter, req *http.Request, params martini.Params) {
 	c := appengine.NewContext(req)
 

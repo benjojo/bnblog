@@ -26,7 +26,7 @@ a:visited { color:#828282; text-decoration:none; }
 
 .pagebreak {page-break-before:always}
 
-pre { overflow: auto; padding: 2px; max-width:600px; }
+pre { overflow: auto; padding: 2px; max-width:90%; }
 pre:hover {overflow:auto}
 
 code { background: #333; }

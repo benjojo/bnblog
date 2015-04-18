@@ -1,5 +1,5 @@
 body  { font-family:Verdana, Geneva, sans-serif; font-size:10pt; color:#828282; }
-td    { font-family:Verdana, Geneva, sans-serif; font-size:10pt; color:#828282; }
+td    { font-family:Verdana, Geneva, sans-serif; font-size:10pt; color:#3A3A3A; }
 .subtext td { font-family:Verdana, Geneva, sans-serif; font-size:  7pt; color:#828282; }
 
 textarea { font-family:Courier; font-size:10pt; color:#000000; }
@@ -9,7 +9,7 @@ a:visited { color:#828282; text-decoration:none; }
 
 .default { font-family:Verdana, Geneva, sans-serif; font-size: 10pt; color:#828282; }
 .title   { font-family:Verdana, Geneva, sans-serif; font-size: 10pt; color:#828282; }
-.yclinks { font-family:Verdana, Geneva, sans-serif; font-size:  8pt; color:#828282; }
+.links { font-family:Verdana, Geneva, sans-serif; font-size:  8pt; color:#828282; }
 
 .comment a:link, .comment a:visited { text-decoration:underline;}
 .dead a:link, .dead a:visited { color:#dddddd; }

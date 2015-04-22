@@ -173,3 +173,8 @@ func ExportAllFiles(rw http.ResponseWriter, req *http.Request) (export []File) {
 
 	return export
 }
+
+func GimmeDC(rw http.ResponseWriter, req *http.Request) string {
+	c := appengine.NewContext(req)
+	return appengine.Datacenter(c)
+}

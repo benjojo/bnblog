@@ -57,6 +57,8 @@ func init() {
 	m.Use(func(res http.ResponseWriter, req *http.Request) {
 		res.Header().Add("Cache-Control", "public")
 		res.Header().Add("X-Powered-By", "uW0t-m8")
+		res.Header().Add("X-Served-By", GimmeDC(res, req))
+		res.Header().Add("X-Served-For", req.Header.Get("CF-RAY"))
 	})
 
 	http.Handle("/", m)

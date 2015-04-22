@@ -29,11 +29,10 @@ func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params
 		http.Error(rw, fmt.Sprintf("wat? %s", u), http.StatusForbidden)
 		return
 	}
-	cc := GibContextPls(req)
 
 	hc := &http.Client{
 		Transport: &oauth2.Transport{
-			Source: google.AppEngineTokenSource(cc, storage.ScopeFullControl),
+			Source: google.AppEngineTokenSource(c, storage.ScopeFullControl),
 			Base:   &urlfetch.Transport{Context: c},
 		},
 	}
@@ -100,13 +99,13 @@ func ReadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 
 	rc, err := storage.NewReader(ctx, bucket, params["tag"])
 	if err != nil {
-		// d.errorf("readFile: unable to open file from bucket %q, file %q: %v", bucket, params["tag"], err)
+		log.Warningf(c, "readFile: unable to open file from bucket %q, file %q: %v", bucket, params["tag"], err)
 		return
 	}
 	defer rc.Close()
 	slurp, err := ioutil.ReadAll(rc)
 	if err != nil {
-		// d.errorf("readFile: unable to read data from bucket %q, file %q: %v", bucket, params["tag"], err)
+		log.Warningf(c, "readFile: unable to read data from bucket %q, file %q: %v", bucket, params["tag"], err)
 		return
 	}
 	o, _ := storage.StatObject(ctx, bucket, params["tag"])

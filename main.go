@@ -35,6 +35,7 @@ type PostFormatted struct {
 func init() {
 	m := martini.Classic()
 	m.Get("/post/:name", ReadPost)
+	m.Get("/post/:name", ReadRawPost)
 	m.Post("/admin/new", PublishPost)
 	m.Get("/admin/", Admin)
 	m.Get("/", ListPosts)
@@ -94,6 +95,20 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func ReadRawPost(rw http.ResponseWriter, req *http.Request, params martini.Params) {
+	c := appengine.NewContext(req)
+	k := datastore.NewKey(c, "Post", params["name"], 0, nil)
+	post := Post{}
+	err := datastore.Get(c, k, &post)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	postd, _ := base64.StdEncoding.DecodeString(post.Content)
+	rw.Write(postd)
 }
 
 func ListPosts(rw http.ResponseWriter, req *http.Request) {

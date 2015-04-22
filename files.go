@@ -113,3 +113,63 @@ func ReadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 
 	rw.Write([]byte(slurp))
 }
+
+type File struct {
+	Name    string
+	Content []byte
+	Type    string
+}
+
+func ExportAllFiles(rw http.ResponseWriter, req *http.Request) (export []File) {
+	c := appengine.NewContext(req)
+
+	export = make([]File, 0)
+
+	bucket := ""
+	if bucket == "" {
+		var err error
+		if bucket, err = file.DefaultBucketName(c); err != nil {
+			// log.Errorf(c, "failed to get default GCS bucket name: %v", err)
+			return
+		}
+	}
+
+	hc := &http.Client{
+		Transport: &oauth2.Transport{
+			Source: google.AppEngineTokenSource(c, storage.ScopeFullControl),
+			Base:   &urlfetch.Transport{Context: c},
+		},
+	}
+
+	ctx := cloud.NewContext(appengine.AppID(c), hc)
+
+	query := &storage.Query{Prefix: ""}
+	for query != nil {
+		objs, err := storage.ListObjects(ctx, bucket, query)
+		if err != nil {
+			//d.errorf("listBucket: unable to list bucket %q: %v", bucket, err)
+			return
+		}
+		query = objs.Next
+
+		for _, obj := range objs.Results {
+			//d.dumpStats(obj)
+			newfile := File{}
+			newfile.Name = obj.Name
+			newfile.Type = obj.ContentType
+
+			rc, err := storage.NewReader(ctx, bucket, obj.Name)
+			if err != nil {
+				log.Warningf(c, "readFile: unable to open file from bucket %q, file %q: %v", bucket, obj.Name, err)
+				return
+			}
+			defer rc.Close()
+			slurp, err := ioutil.ReadAll(rc)
+
+			newfile.Content = slurp
+			export = append(export, newfile)
+		}
+	}
+
+	return export
+}

@@ -40,10 +40,11 @@ func init() {
 	m.Get("/admin/", Admin)
 	m.Get("/", ListPosts)
 	m.Get("/all", ListPosts)
+	m.Get("/rss.xml", GetRSS)
+	m.Get("/sitemap.xml", GetSitemap)
 	m.Get("/admin/run_gc", Run_GC)
 	m.Get("/admin/backup.tar", Producebackup)
 	m.Get("/admin/remove/:name", RemovePost)
-
 	m.Post("/admin/uploadfile", UploadFile)
 
 	m.Get("/lessons/:year/:month/:day/:title", MigrateOldURLS)

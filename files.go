@@ -110,6 +110,8 @@ func ReadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 	}
 	o, err := storage.StatObject(ctx, bucket, params["tag"])
 	if err != nil {
+		rw.Header().Add("Content-Type", "image/png")
+	} else {
 		rw.Header().Add("Content-Type", o.ContentType)
 	}
 

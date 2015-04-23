@@ -108,8 +108,10 @@ func ReadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		log.Warningf(c, "readFile: unable to read data from bucket %q, file %q: %v", bucket, params["tag"], err)
 		return
 	}
-	o, _ := storage.StatObject(ctx, bucket, params["tag"])
-	rw.Header().Add("Content-Type", o.ContentType)
+	o, err := storage.StatObject(ctx, bucket, params["tag"])
+	if err != nil {
+		rw.Header().Add("Content-Type", o.ContentType)
+	}
 
 	rw.Write([]byte(slurp))
 }

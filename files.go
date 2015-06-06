@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/codegangsta/martini"
 
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/appengine"
@@ -77,15 +78,15 @@ func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params
 }
 
 func ReadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) {
-	c := appengine.NewContext(req)
+	var c context.Context
+	var ctx context.Context
+	c = appengine.NewContext(req)
 
-	bucket := ""
-	if bucket == "" {
-		var err error
-		if bucket, err = file.DefaultBucketName(c); err != nil {
-			// log.Errorf(c, "failed to get default GCS bucket name: %v", err)
-			return
-		}
+	var err error
+	var bucket string
+	if bucket, err = file.DefaultBucketName(c); err != nil {
+		// log.Errorf(c, "failed to get default GCS bucket name: %v", err)
+		return
 	}
 
 	hc := &http.Client{
@@ -95,7 +96,7 @@ func ReadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		},
 	}
 
-	ctx := cloud.NewContext(appengine.AppID(c), hc)
+	ctx = cloud.NewContext(appengine.AppID(c), hc)
 
 	rc, err := storage.NewReader(ctx, bucket, params["tag"])
 	if err != nil {

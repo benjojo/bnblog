@@ -2,6 +2,7 @@ application: benjoblog
 version: 2
 runtime: go
 api_version: go1
+default_expiration: "4d 5h"
 
 handlers:
 
@@ -11,3 +12,4 @@ handlers:
 
 - url: /.*
   script: _go_app
+

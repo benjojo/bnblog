@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-var PostTemplate = template.Must(template.ParseFiles("public/pagetempl.html"))
-var HomeTemplate = template.Must(template.ParseFiles("public/hometempl.html"))
+var PostTemplate = template.Must(template.ParseFiles("public2/pagetempl.html"))
+var HomeTemplate = template.Must(template.ParseFiles("public2/hometempl.html"))
 
 type Post struct {
 	Author  string
@@ -57,10 +57,12 @@ func init() {
 
 	m.Use(func(res http.ResponseWriter, req *http.Request) {
 		res.Header().Add("Cache-Control", "public")
-		res.Header().Add("X-Powered-By", "uW0t-m8")
+		res.Header().Add("X-Powered-uW0t", "marBy-m8")
 		res.Header().Add("X-Served-By", GimmeDC(res, req))
 		res.Header().Add("X-Served-For", req.Header.Get("CF-RAY"))
 	})
+
+	m.Use(martini.Static("public2"))
 
 	http.Handle("/", m)
 }

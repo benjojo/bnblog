@@ -80,7 +80,13 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 	k := datastore.NewKey(c, "Post", params["name"], 0, nil)
 	post := Post{}
 	err := datastore.Get(c, k, &post)
+
 	if err != nil {
+		if fmt.Sprint(err) == "datastore: no such entity" {
+			http.Error(rw, "This blog post cannot be found, Please check your URL", http.StatusNotFound)
+			return
+		}
+
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}

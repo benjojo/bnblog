@@ -122,7 +122,7 @@ func Admin(rw http.ResponseWriter, req *http.Request, params martini.Params) {
 	}{
 		Date: time.Now().Format("2006-01-02 15:04:05"),
 	}
-	var AdminPage = template.Must(template.ParseFiles("public/admin.html"))
+	var AdminPage = template.Must(template.ParseFiles("public2/admin.html"))
 
 	err := AdminPage.Execute(rw, layoutData)
 	if err != nil {

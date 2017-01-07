@@ -2,20 +2,19 @@ package bnblog
 
 import (
 	"fmt"
+
 	"github.com/codegangsta/martini"
 
+	"io/ioutil"
+	"net/http"
+
 	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
+	"google.golang.org/api/iterator"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/file"
 	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/urlfetch"
 	"google.golang.org/appengine/user"
-	"google.golang.org/cloud"
 	"google.golang.org/cloud/storage"
-	"io/ioutil"
-	"net/http"
 )
 
 func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) {
@@ -29,13 +28,6 @@ func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params
 	if fmt.Sprintf("%s", u) != "ben@benjojo.co.uk" && fmt.Sprintf("%s", u) != "ben@benjojo.com" {
 		http.Error(rw, fmt.Sprintf("wat? %s", u), http.StatusForbidden)
 		return
-	}
-
-	hc := &http.Client{
-		Transport: &oauth2.Transport{
-			Source: google.AppEngineTokenSource(c, storage.ScopeFullControl),
-			Base:   &urlfetch.Transport{Context: c},
-		},
 	}
 
 	file_from_client, headers, err := req.FormFile("fileToUpload")
@@ -55,14 +47,17 @@ func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params
 			return
 		}
 	}
-	ctx := cloud.NewContext(appengine.AppID(c), hc)
+	storageclient, err := storage.NewClient(c)
+	defer storageclient.Close()
+	actualbucket := storageclient.Bucket(bucket)
 
 	fn := RandString(10)
 
 	bin, _ := ioutil.ReadAll(file_from_client)
 
-	wc1 := storage.NewWriter(ctx, bucket, fn)
+	wc1 := actualbucket.Object(fn).NewWriter(c)
 	wc1.ContentType = headers.Header.Get("Content-Type")
+
 	wc1.ACL = []storage.ACLRule{{storage.AllUsers, storage.RoleReader}}
 	if _, err := wc1.Write(bin); err != nil {
 		log.Warningf(c, "ouch! %s", err)
@@ -70,7 +65,7 @@ func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params
 	if err := wc1.Close(); err != nil {
 		log.Warningf(c, "ouch! %s", err)
 	}
-	log.Infof(c, "updated object:", wc1.Object())
+	// log.Infof(c, "updated object:", wc1.Object())
 
 	rw.Write([]byte(fn))
 	log.Warningf(c, "fin.")
@@ -79,7 +74,6 @@ func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params
 
 func ReadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) {
 	var c context.Context
-	var ctx context.Context
 	c = appengine.NewContext(req)
 
 	var err error
@@ -89,16 +83,11 @@ func ReadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		return
 	}
 
-	hc := &http.Client{
-		Transport: &oauth2.Transport{
-			Source: google.AppEngineTokenSource(c, storage.ScopeFullControl),
-			Base:   &urlfetch.Transport{Context: c},
-		},
-	}
+	storageclient, err := storage.NewClient(c)
+	defer storageclient.Close()
+	actualbucket := storageclient.Bucket(bucket)
 
-	ctx = cloud.NewContext(appengine.AppID(c), hc)
-
-	rc, err := storage.NewReader(ctx, bucket, params["tag"])
+	rc, err := actualbucket.Object(params["tag"]).NewReader(c)
 	if err != nil {
 		log.Warningf(c, "readFile: unable to open file from bucket %q, file %q: %v", bucket, params["tag"], err)
 		return
@@ -109,7 +98,7 @@ func ReadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		log.Warningf(c, "readFile: unable to read data from bucket %q, file %q: %v", bucket, params["tag"], err)
 		return
 	}
-	o, err := storage.StatObject(ctx, bucket, params["tag"])
+	o, err := actualbucket.Object(params["tag"]).Attrs(c)
 	if err != nil {
 		rw.Header().Add("Content-Type", "image/png")
 	} else {
@@ -139,38 +128,39 @@ func ExportAllFiles(rw http.ResponseWriter, req *http.Request) (export []File) {
 		}
 	}
 
-	hc := &http.Client{
-		Transport: &oauth2.Transport{
-			Source: google.AppEngineTokenSource(c, storage.ScopeFullControl),
-			Base:   &urlfetch.Transport{Context: c},
-		},
-	}
-
-	ctx := cloud.NewContext(appengine.AppID(c), hc)
+	storageclient, _ := storage.NewClient(c)
+	defer storageclient.Close()
+	actualbucket := storageclient.Bucket(bucket)
 
 	query := &storage.Query{Prefix: ""}
 	for query != nil {
-		objs, err := storage.ListObjects(ctx, bucket, query)
-		if err != nil {
-			//d.errorf("listBucket: unable to list bucket %q: %v", bucket, err)
-			return
-		}
-		query = objs.Next
 
-		for _, obj := range objs.Results {
-			//d.dumpStats(obj)
+		objs := actualbucket.Objects(c, query)
+
+		for {
+			obj, err := objs.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return
+			}
+
 			newfile := File{}
 			newfile.Name = obj.Name
 			newfile.Type = obj.ContentType
 
-			rc, err := storage.NewReader(ctx, bucket, obj.Name)
+			rc, err := actualbucket.Object(obj.Name).NewReader(c)
 			if err != nil {
 				log.Warningf(c, "readFile: unable to open file from bucket %q, file %q: %v", bucket, obj.Name, err)
 				return
 			}
 			defer rc.Close()
 			slurp, err := ioutil.ReadAll(rc)
-
+			if err != nil {
+				log.Warningf(c, "readFile: unable to read data from bucket %q, file %q: %v", bucket, obj.Name, err)
+				return
+			}
 			newfile.Content = slurp
 			export = append(export, newfile)
 		}

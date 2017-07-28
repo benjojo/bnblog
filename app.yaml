@@ -1,5 +1,3 @@
-application: benjoblog
-version: 4
 runtime: go
 api_version: go1
 default_expiration: "4d 5h"

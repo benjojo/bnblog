@@ -3,64 +3,20 @@
 <head>
     <meta content="origin" name="referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="/main.css?2018" rel="stylesheet" type="text/css">
+    <link href="/main.css?2021" rel="stylesheet" type="text/css">
     <title>{{.Title}}</title>
 </head>
 <center>
 <body style= "background-color: #FFF">
-    <table border="0" cellpadding="0" cellspacing="0" style="background-color: #DDD" width="95%">
-        <tr>
-            <td style="background-color: #EEE">
-                <table border="0" cellpadding="0" cellspacing="0" style="padding:2px" width="100%">
-                    <tr>
 
-                        <td style="line-height:12pt; height:10px;">
-                          <span class="pagetop">
-                            <b>
-                              <a href="/">Ben's Blog</a>
-                            </b>
-                            <a href="//benjojo.co.uk">Main Site</a> | 
-                            <a href="/">All Posts</a>
-                        </span>
-                      </td>
+<div class="topbar">
+    <a style="float: left" href="/">< All posts</a><a style="padding-left: 10px;" href="https://twitter.com/benjojo12">Twitter</a><a style="padding-left: 10px;" href="/rss.xml">RSS</a><a href="https://github.com/benjojo"> GitHub</a>
+</div>
 
-                        <td style="text-align:right;padding-right:4px;">
-                        <span class="pagetop"><a href="https://twitter.com/benjojo12">Twitter</a> | <a href="/rss.xml">RSS</a></span></td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-
-        <tr style="height:10px">
-            <td></td>
-        </tr>
-
-        <tr>
-            <td style="padding-left: 40px;      padding-right: 40px;">
-                <table border="0" cellpadding="0" cellspacing="0">
+<div class="contain">
 {{.Content}}
-                    <tr>
-                        <td colspan="2"></td>
+</div>
 
-                        <td class="title"></td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
 
-        <tr>
-            <td>
-                <table cellpadding="1" cellspacing="0" width="100%">
-                    <tr>
-                        <td style="background-color: #555"></td>
-                    </tr>
-                </table><br>
-	                <span class="links"><a href="https://github.com/benjojo/bnblog">Like the blogging engine? Click here to see the code</a></span><br>
-                <br>
-                <br>
-            </td>
-        </tr>
-    </table><br>
-    <center>
 </body>
 </html>

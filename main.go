@@ -1,16 +1,18 @@
 package bnblog
 
 import (
-	"appengine"
-	"appengine/datastore"
 	"encoding/base64"
 	"fmt"
-	"github.com/codegangsta/martini"
-	"github.com/russross/blackfriday"
 	"net/http"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/codegangsta/martini"
+	"github.com/russross/blackfriday"
+
+	"appengine"
+	"appengine/datastore"
 )
 
 var PostTemplate = template.Must(template.ParseFiles("public2/pagetempl.html"))
@@ -57,7 +59,6 @@ func init() {
 
 	m.Use(func(res http.ResponseWriter, req *http.Request) {
 		res.Header().Add("Cache-Control", "public")
-		res.Header().Add("X-Powered-uW0t", "marBy-m8")
 		res.Header().Add("X-Served-By", GimmeDC(res, req))
 		res.Header().Add("X-Served-For", req.Header.Get("CF-RAY"))
 	})
@@ -99,9 +100,11 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 	layoutData := struct {
 		Title   string
 		Content string
+		Date    string
 	}{
 		Title:   lines[0],
 		Content: string(output),
+		Date:    Post.Date.Format("Jan 2 2006"),
 	}
 
 	err = PostTemplate.Execute(rw, layoutData)

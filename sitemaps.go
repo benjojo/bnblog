@@ -1,11 +1,12 @@
 package bnblog
 
 import (
-	"appengine"
-	"appengine/datastore"
 	"fmt"
 	"net/http"
 	"strings"
+
+	"appengine"
+	"appengine/datastore"
 )
 
 func GetSitemap(rw http.ResponseWriter, req *http.Request) {

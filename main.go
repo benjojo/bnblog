@@ -104,7 +104,7 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 	}{
 		Title:   lines[0],
 		Content: string(output),
-		Date:    Post.Date.Format("Jan 2 2006"),
+		Date:    post.Date.Format("Jan 2 2006"),
 	}
 
 	err = PostTemplate.Execute(rw, layoutData)

@@ -50,7 +50,7 @@ func GetRSS(rw http.ResponseWriter, req *http.Request) {
 				Title:       v.Title,
 				Link:        &feeds.Link{Href: fmt.Sprintf("https://blog.benjojo.co.uk/post/%s", v.Slug)},
 				Description: string(postd[:256]),
-				Author:      &feeds.Author{"Ben Cox <ben@benjojo.co.uk>", "ben@benjojo.co.uk"},
+				Author:      &feeds.Author{"ben@benjojo.co.uk", "ben@benjojo.co.uk"},
 				Created:     v.Date,
 				Id:          generateBadUUID(v.Title),
 			}

@@ -52,7 +52,7 @@ func GetRSS(rw http.ResponseWriter, req *http.Request) {
 				Description: string(postd[:256]),
 				Author:      &feeds.Author{"Ben Cox <ben@benjojo.co.uk>", "ben@benjojo.co.uk"},
 				Created:     v.Date,
-				ID:          generateBadUUID(v.Title),
+				Id:          generateBadUUID(v.Title),
 			}
 			feed.Items = append(feed.Items, wot)
 		}

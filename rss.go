@@ -1,14 +1,17 @@
 package bnblog
 
 import (
-	"appengine"
-	"appengine/datastore"
+	"crypto/md5"
 	"encoding/base64"
 	"fmt"
-	"github.com/gorilla/feeds"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/gorilla/feeds"
+
+	"appengine"
+	"appengine/datastore"
 )
 
 func GetRSS(rw http.ResponseWriter, req *http.Request) {
@@ -47,8 +50,9 @@ func GetRSS(rw http.ResponseWriter, req *http.Request) {
 				Title:       v.Title,
 				Link:        &feeds.Link{Href: fmt.Sprintf("https://blog.benjojo.co.uk/post/%s", v.Slug)},
 				Description: string(postd[:256]),
-				Author:      &feeds.Author{"Ben Cox", "ben@benjojo.co.uk"},
+				Author:      &feeds.Author{"Ben Cox <ben@benjojo.co.uk>", "ben@benjojo.co.uk"},
 				Created:     v.Date,
+				ID:          generateBadUUID(v.Title),
 			}
 			feed.Items = append(feed.Items, wot)
 		}
@@ -61,4 +65,18 @@ func GetRSS(rw http.ResponseWriter, req *http.Request) {
 	}
 	rw.Header().Add("Content-Type", "application/rss+xml")
 	rw.Write([]byte(rss))
+}
+
+// This is a hack as you might have guessed. This blogging system was
+// never designed with UUIDs in mind, so I'm sort of just generating one
+// out of the title, MD5 is fine since I don't think I am going attack
+// myself with colliding titles.
+func generateBadUUID(title string) string {
+	hashbytes := md5.Sum([]byte(title))
+	return fmt.Sprintf("%1x%1x%1x%1x-%1x%1x-40%1x-%1x%1x-%1x%1x%1x%1x%1x%1x",
+		hashbytes[0], hashbytes[1], hashbytes[2], hashbytes[3], hashbytes[4],
+		hashbytes[5], hashbytes[6], hashbytes[7], hashbytes[8], hashbytes[9],
+		hashbytes[10], hashbytes[11], hashbytes[12], hashbytes[13],
+		hashbytes[14])
+
 }

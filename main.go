@@ -1,4 +1,4 @@
-package bnblog
+package main
 
 import (
 	"encoding/base64"
@@ -11,8 +11,8 @@ import (
 	"github.com/codegangsta/martini"
 	"github.com/russross/blackfriday"
 
-	"appengine"
-	"appengine/datastore"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
 )
 
 var PostTemplate = template.Must(template.ParseFiles("public2/pagetempl.html"))
@@ -34,7 +34,7 @@ type PostFormatted struct {
 	Title   string
 }
 
-func init() {
+func main() {
 	m := martini.Classic()
 	m.Get("/post/:name", ReadPost)
 	m.Get("/raw/:name", ReadRawPost)
@@ -66,6 +66,8 @@ func init() {
 	m.Use(martini.Static("public2"))
 
 	http.Handle("/", m)
+
+	appengine.Main()
 }
 
 func MigrateOldURLS(rw http.ResponseWriter, req *http.Request, params martini.Params) {

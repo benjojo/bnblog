@@ -1,14 +1,15 @@
-package bnblog
+package main
 
 import (
-	"appengine"
-	"appengine/datastore"
 	"archive/tar"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
+
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
 )
 
 func Producebackup(rw http.ResponseWriter, req *http.Request) {

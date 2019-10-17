@@ -1,13 +1,12 @@
-runtime: go
-api_version: go1
+runtime: go111
 default_expiration: "4d 5h"
 
 handlers:
 
 - url: /admin/.*
-  script: _go_app
+  script: auto
   login: required
 
 - url: /.*
-  script: _go_app
+  script: auto
 

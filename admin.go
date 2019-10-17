@@ -1,4 +1,4 @@
-package bnblog
+package main
 
 import (
 	"appengine"
@@ -12,6 +12,12 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/codegangsta/martini"
+
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
+	"google.golang.org/appengine/user"
 )
 
 func PublishPost(rw http.ResponseWriter, req *http.Request, params martini.Params) {

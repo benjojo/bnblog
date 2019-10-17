@@ -1,4 +1,4 @@
-package bnblog
+package main
 
 import (
 	"crypto/md5"
@@ -10,8 +10,8 @@ import (
 
 	"github.com/gorilla/feeds"
 
-	"appengine"
-	"appengine/datastore"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
 )
 
 func GetRSS(rw http.ResponseWriter, req *http.Request) {

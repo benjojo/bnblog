@@ -1,4 +1,4 @@
-package bnblog
+package main
 
 import (
 	"fmt"
@@ -8,13 +8,13 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"cloud.google.com/go/storage"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/file"
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/user"
-	"google.golang.org/cloud/storage"
 )
 
 func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params) {
@@ -59,7 +59,7 @@ func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params
 	wc1 := actualbucket.Object(fn).NewWriter(c)
 	wc1.ContentType = headers.Header.Get("Content-Type")
 
-	wc1.ACL = []storage.ACLRule{{storage.AllUsers, storage.RoleReader}}
+	wc1.ACL = []storage.ACLRule{{Entity: storage.AllUsers, Role: storage.RoleReader}}
 	if _, err := wc1.Write(bin); err != nil {
 		log.Warningf(c, "ouch! %s", err)
 	}

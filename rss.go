@@ -63,7 +63,7 @@ func GetRSS(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, fmt.Sprintf("argh %s", err), http.StatusInternalServerError)
 		return
 	}
-	rw.Header().Add("Content-Type", "application/rss+xml")
+	rw.Header().Add("Content-Type", "application/rss+xml; charset=utf-8")
 	rw.Write([]byte(rss))
 }
 

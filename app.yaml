@@ -1,5 +1,8 @@
 runtime: go111
 default_expiration: "4d 5h"
+automatic_scaling:
+  min_idle_instances: 1
+  max_idle_instances: 1
 
 handlers:
 

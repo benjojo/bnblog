@@ -1,9 +1,6 @@
 package main
 
 import (
-	"appengine"
-	"appengine/datastore"
-	"appengine/user"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"

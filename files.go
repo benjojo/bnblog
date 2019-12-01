@@ -2,12 +2,10 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/codegangsta/martini"
-
 	"io/ioutil"
 	"net/http"
 
+	"github.com/codegangsta/martini"
 	"cloud.google.com/go/storage"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"

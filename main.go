@@ -142,9 +142,12 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		layoutData.SecondYear = PostTitleCache[post.R2].Date.Year()
 
 		for _, v := range PostTitleCache {
-			layoutData.RandomLink = "/post/" + v.Slug
-			layoutData.SecondTitle = PostTitleCache[layoutData.RandomLink].Title
-			layoutData.SecondYear = PostTitleCache[layoutData.RandomLink].Date.Year()
+			if strings.HasPrefix("DRAFT-", v.Title) {
+				layoutData.RandomLink = "/post/" + v.Slug
+				layoutData.RandomTitle = PostTitleCache[layoutData.RandomLink].Title
+				layoutData.RandomYear = PostTitleCache[layoutData.RandomLink].Date.Year()
+				break
+			}
 		}
 
 	}
@@ -163,7 +166,9 @@ func findReccomendations(Incoming *Post) {
 		if v.Type == Incoming.Type {
 			if v.Date.Unix() < Incoming.Date.Unix() {
 				// If the post is older
-				Candidates = append(Candidates, v.Slug)
+				if strings.HasPrefix("DRAFT-", v.Title) {
+					Candidates = append(Candidates, v.Slug)
+				}
 			}
 		}
 	}

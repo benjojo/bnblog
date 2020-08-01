@@ -70,23 +70,24 @@ func Producebackup(rw http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	filegrab := ExportAllFiles(rw, req)
+	if req.URL.Query().Get("no-files") == "" {
+		filePipe := make(chan File)
+		go ExportAllFiles(rw, req, filePipe)
 
-	for _, v := range filegrab {
+		for v := range filePipe {
 
-		hdr := &tar.Header{
-			Name: fmt.Sprintf("files/%s.blob", v.Name),
-			Size: int64(len(v.Content)),
-		}
-		if err := tw.WriteHeader(hdr); err != nil {
-			http.Error(rw, err.Error(), http.StatusInternalServerError)
-			return
-			//log.Fatalln(err)
-		}
-		if _, err := tw.Write([]byte(v.Content)); err != nil {
-			http.Error(rw, err.Error(), http.StatusInternalServerError)
-			return
-			//log.Fatalln(err)
+			hdr := &tar.Header{
+				Name: fmt.Sprintf("files/%s.blob", v.Name),
+				Size: int64(len(v.Content)),
+			}
+			if err := tw.WriteHeader(hdr); err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if _, err := tw.Write([]byte(v.Content)); err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 	}
 

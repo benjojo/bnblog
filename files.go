@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/codegangsta/martini"
 	"cloud.google.com/go/storage"
+	"github.com/codegangsta/martini"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
 	"google.golang.org/appengine"
@@ -113,10 +113,8 @@ type File struct {
 	Type    string
 }
 
-func ExportAllFiles(rw http.ResponseWriter, req *http.Request) (export []File) {
+func ExportAllFiles(rw http.ResponseWriter, req *http.Request, filepipe chan File) {
 	c := appengine.NewContext(req)
-
-	export = make([]File, 0)
 
 	bucket := ""
 	if bucket == "" {
@@ -160,12 +158,11 @@ func ExportAllFiles(rw http.ResponseWriter, req *http.Request) (export []File) {
 				log.Warningf(c, "readFile: unable to read data from bucket %q, file %q: %v", bucket, obj.Name, err)
 				return
 			}
+
 			newfile.Content = slurp
-			export = append(export, newfile)
+			filepipe <- newfile
 		}
 	}
-
-	return export
 }
 
 func GimmeDC(rw http.ResponseWriter, req *http.Request) string {

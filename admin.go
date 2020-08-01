@@ -49,7 +49,7 @@ func PublishPost(rw http.ResponseWriter, req *http.Request, params martini.Param
 		Date:    postdate,
 		Slug:    postslug,
 		Title:   strings.Split(req.PostFormValue("post"), "\n")[0],
-		Type:    req.PostFormValue("type"),
+		Type:    req.PostFormValue("cata"),
 		R1:      req.PostFormValue("R1"),
 		R2:      req.PostFormValue("R2"),
 	}

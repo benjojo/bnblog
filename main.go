@@ -142,7 +142,7 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		layoutData.SecondYear = PostTitleCache[post.R2].Date.Year()
 
 		for _, v := range PostTitleCache {
-			if strings.HasPrefix("DRAFT-", v.Title) {
+			if !strings.HasPrefix("DRAFT-", v.Slug) {
 				layoutData.RandomLink = "/post/" + v.Slug
 				layoutData.RandomTitle = PostTitleCache[layoutData.RandomLink].Title
 				layoutData.RandomYear = PostTitleCache[layoutData.RandomLink].Date.Year()

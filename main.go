@@ -166,7 +166,7 @@ func findReccomendations(Incoming *Post) {
 		if v.Type == Incoming.Type {
 			if v.Date.Unix() < Incoming.Date.Unix() {
 				// If the post is older
-				if strings.HasPrefix("DRAFT-", v.Title) {
+				if !strings.HasPrefix("DRAFT-", v.Title) {
 					Candidates = append(Candidates, v.Slug)
 				}
 			}

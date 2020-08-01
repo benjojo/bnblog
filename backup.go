@@ -5,6 +5,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime"
 	"net/http"
 	"strings"
 
@@ -71,20 +73,29 @@ func Producebackup(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if req.URL.Query().Get("no-files") == "" {
-		filePipe := make(chan File)
+		filePipe := make(chan backupFile)
 		go ExportAllFiles(rw, req, filePipe)
 
 		for v := range filePipe {
 
+			FileName := fmt.Sprintf("files/%s.blob", v.Name)
+			MimeType, err := mime.ExtensionsByType(v.Type)
+			if err == nil {
+				if len(MimeType) != 0 {
+					FileName = fmt.Sprintf("files/%s%s", v.Name, MimeType[0])
+				}
+			}
+
 			hdr := &tar.Header{
-				Name: fmt.Sprintf("files/%s.blob", v.Name),
-				Size: int64(len(v.Content)),
+				Name: FileName,
+				Size: int64(v.Size),
 			}
 			if err := tw.WriteHeader(hdr); err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			if _, err := tw.Write([]byte(v.Content)); err != nil {
+
+			if _, err := io.Copy(tw, v.Reader); err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)
 				return
 			}

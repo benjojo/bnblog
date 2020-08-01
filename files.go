@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -113,7 +114,14 @@ type File struct {
 	Type    string
 }
 
-func ExportAllFiles(rw http.ResponseWriter, req *http.Request, filepipe chan File) {
+type backupFile struct {
+	Name   string
+	Size   int
+	Reader io.ReadCloser
+	Type   string
+}
+
+func ExportAllFiles(rw http.ResponseWriter, req *http.Request, filepipe chan backupFile) {
 	c := appengine.NewContext(req)
 
 	bucket := ""
@@ -140,29 +148,30 @@ func ExportAllFiles(rw http.ResponseWriter, req *http.Request, filepipe chan Fil
 				break
 			}
 			if err != nil {
-				return
+				break
 			}
 
-			newfile := File{}
+			newfile := backupFile{}
 			newfile.Name = obj.Name
 			newfile.Type = obj.ContentType
+			newfile.Size = int(obj.Size)
 
 			rc, err := actualbucket.Object(obj.Name).NewReader(c)
 			if err != nil {
 				log.Warningf(c, "readFile: unable to open file from bucket %q, file %q: %v", bucket, obj.Name, err)
-				return
-			}
-			defer rc.Close()
-			slurp, err := ioutil.ReadAll(rc)
-			if err != nil {
-				log.Warningf(c, "readFile: unable to read data from bucket %q, file %q: %v", bucket, obj.Name, err)
-				return
+				break
 			}
 
-			newfile.Content = slurp
+			if err != nil {
+				log.Warningf(c, "readFile: unable to read data from bucket %q, file %q: %v", bucket, obj.Name, err)
+				break
+			}
+
+			newfile.Reader = rc
 			filepipe <- newfile
 		}
 	}
+	close(filepipe)
 }
 
 func GimmeDC(rw http.ResponseWriter, req *http.Request) string {

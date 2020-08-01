@@ -181,9 +181,14 @@ func findReccomendations(Incoming *Post) {
 	if Incoming.R1 == "" {
 		Incoming.R1 = Candidates[rand.Intn(len(Candidates)-1)]
 	}
-
 	if Incoming.R2 == "" {
-		Incoming.R2 = Candidates[rand.Intn(len(Candidates)-1)]
+		for i := 0; i < 100; i++ {
+			Incoming.R2 = Candidates[rand.Intn(len(Candidates)-1)]
+			if Incoming.R2 == Incoming.R1 {
+				continue
+			}
+			break
+		}
 	}
 }
 

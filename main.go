@@ -183,7 +183,7 @@ func findReccomendations(Incoming *Post) {
 	}
 
 	if Incoming.R2 != "" {
-		Incoming.R1 = Candidates[rand.Intn(len(Candidates)-1)]
+		Incoming.R2 = Candidates[rand.Intn(len(Candidates)-1)]
 	}
 }
 

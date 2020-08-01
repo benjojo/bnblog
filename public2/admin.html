@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta content="origin" name="referrer">
-    <link href="/main.css?2018" rel="stylesheet" type="text/css">
+    <link href="/main.css?2020" rel="stylesheet" type="text/css">
     <title>Admin panel</title>
 </head>
 <center>
@@ -44,8 +44,19 @@
 <textarea name="post" cols=40 rows=4>TestPost
 ===
 </textarea><br>
-<input type="text" name="slug"/><br>
+<input type="text" name="slug" placeholder="Slug (If empty a draft)"/><br>
 <input type="text" name="date" value="{{.Date}}"/><br>
+<select id="type">                 
+    <option value="None">Draft</option>
+    <option value="Comedy">Comedy</option>
+    <option value="Hardware">Hardware</option>
+    <option value="Mystery">Mystery</option>
+    <option value="Networking">Networking</option>
+    <option value="Problem">Problem</option>
+    <option value="Quirk">Quirk</option>
+</select>
+<input type="text" name="R1" placeholder="First Override (optional)"/><br>
+<input type="text" name="R2" placeholder="First Override (optional)"/><br>
 <input type="submit" value="Publish">
 </form>
 

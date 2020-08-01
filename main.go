@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"math/rand"
 	"net/http"
+	"sort"
 	"strings"
 	"text/template"
 	"time"
@@ -24,6 +26,9 @@ type Post struct {
 	Date    time.Time
 	Slug    string
 	Title   string
+	Type    string // Possible types [Comedy,Hardware,Mystery,Networking,Problem,Quirk]
+	R1      string // Override of the Rec 1
+	R2      string // Override of the Rec 2
 }
 
 type PostFormatted struct {
@@ -67,6 +72,7 @@ func main() {
 
 	http.Handle("/", m)
 
+	PostTitleCache = make(map[string]Post)
 	appengine.Main()
 }
 
@@ -78,6 +84,9 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 	// c := appengine.NewContext(r)
 	// key := datastore.NewIncompleteKey(c, "Greeting", PostKey(c))
 	// _, err := datastore.Put(c, key, &g)
+	if len(PostTitleCache) == 0 {
+		forceUpdatePostTitleCache(rw, req)
+	}
 
 	c := appengine.NewContext(req)
 	k := datastore.NewKey(c, "Post", params["name"], 0, nil)
@@ -94,6 +103,10 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		return
 	}
 
+	if post.Type != "" {
+		findReccomendations(&post)
+	}
+
 	postd, _ := base64.StdEncoding.DecodeString(post.Content)
 	// post.Content = strings.Replace(string(postd), "\n", "\r\n\r\n", -1)
 	post.Content = string(postd)
@@ -103,15 +116,69 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		Title   string
 		Content string
 		Date    string
+		// Rec links at the bottom
+		HasReccomendations bool
+		FirstRecLink       string
+		FirstTitle         string
+		FirstYear          int
+		SecondRecLink      string
+		SecondTitle        string
+		SecondYear         int
+		RandomLink         string
+		RandomTitle        string
+		RandomYear         int
 	}{
 		Title:   lines[0],
 		Content: string(output),
 		Date:    post.Date.Format("Jan 2 2006"),
 	}
+	if post.R1 != "" && post.R2 != "" {
+		layoutData.HasReccomendations = true
+		layoutData.FirstRecLink = "/post/" + post.R1
+		layoutData.FirstTitle = PostTitleCache[post.R1].Title
+		layoutData.FirstYear = PostTitleCache[post.R1].Date.Year()
+		layoutData.SecondRecLink = "/post/" + post.R2
+		layoutData.SecondTitle = PostTitleCache[post.R2].Title
+		layoutData.SecondYear = PostTitleCache[post.R2].Date.Year()
+
+		for _, v := range PostTitleCache {
+			layoutData.RandomLink = "/post/" + v.Slug
+			layoutData.SecondTitle = PostTitleCache[layoutData.RandomLink].Title
+			layoutData.SecondYear = PostTitleCache[layoutData.RandomLink].Date.Year()
+		}
+
+	}
 
 	err = PostTemplate.Execute(rw, layoutData)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func findReccomendations(Incoming *Post) {
+	rand.Seed(Incoming.Date.Unix())
+	// Make an array of candidates
+	Candidates := make([]string, 0)
+	for _, v := range PostTitleCache {
+		if v.Type == Incoming.Type {
+			if v.Date.Unix() < Incoming.Date.Unix() {
+				// If the post is older
+				Candidates = append(Candidates, v.Slug)
+			}
+		}
+	}
+	if len(Candidates) < 2 {
+		return
+	}
+
+	sort.Strings(Candidates)
+
+	if Incoming.R1 != "" {
+		Incoming.R1 = Candidates[rand.Intn(len(Candidates)-1)]
+	}
+
+	if Incoming.R2 != "" {
+		Incoming.R1 = Candidates[rand.Intn(len(Candidates)-1)]
 	}
 }
 
@@ -129,6 +196,26 @@ func ReadRawPost(rw http.ResponseWriter, req *http.Request, params martini.Param
 	rw.Write(postd)
 }
 
+var PostTitleCache map[string]Post
+
+func updatePostCache(Posts []Post) {
+	for _, v := range Posts {
+		PostTitleCache[v.Slug] = v
+	}
+}
+
+func forceUpdatePostTitleCache(rw http.ResponseWriter, req *http.Request) {
+	c := appengine.NewContext(req)
+	q := datastore.NewQuery("Post").Order("-Date").Limit(100)
+	posts := make([]Post, 0, 100)
+
+	if _, err := q.GetAll(c, &posts); err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	updatePostCache(posts)
+}
+
 func ListPosts(rw http.ResponseWriter, req *http.Request) {
 	c := appengine.NewContext(req)
 	q := datastore.NewQuery("Post").Order("-Date").Limit(100)
@@ -138,6 +225,8 @@ func ListPosts(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	updatePostCache(posts)
+
 	FormattedPosts := make([]PostFormatted, 0)
 
 	for _, v := range posts {

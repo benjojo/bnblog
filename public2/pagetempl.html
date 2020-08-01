@@ -16,6 +16,15 @@
 <div class="contain">
 <h3>{{.Date}}</h3>
 {{.Content}}
+{{if .HasReccomendations}}
+<div class="recbox">
+<p><b>Related Posts:</b></p>
+<p><a href="{{.FirstRecLink}}">{{.FirstTitle}}</a> ({{.FirstYear}})</p>
+<p><a href="{{.SecondRecLink}}">{{.SecondTitle}}</a> ({{.SecondYear}})</p>
+<p><b>Random Post:</b></p>
+<p><a href="{{.RandomLink}}">{{.RandomTitle}}</a>({{.RandomYear}})</p>
+</div>
+{{end}}
 </div>
 
 

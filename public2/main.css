@@ -136,3 +136,25 @@ iframe {
     top: 0px;
     font-size: 19px;
 }
+
+.recbox {
+    color: #444;
+    float: right;
+    text-align: right;
+}
+
+.recbox p {
+    font-size: 14px;
+}
+
+.recbox a:link {
+    color: #02008A;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.recbox a:visited {
+    color: #02008A;
+    text-decoration: none;
+    font-size: 14px;
+}

@@ -4,11 +4,12 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"github.com/codegangsta/martini"
 	"net/http"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/codegangsta/martini"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
@@ -48,14 +49,17 @@ func PublishPost(rw http.ResponseWriter, req *http.Request, params martini.Param
 		Date:    postdate,
 		Slug:    postslug,
 		Title:   strings.Split(req.PostFormValue("post"), "\n")[0],
+		Type:    req.PostFormValue("type"),
+		R1:      req.PostFormValue("R1"),
+		R2:      req.PostFormValue("R2"),
 	}
 	_, err = datastore.Put(c, k, &NP)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 	} else {
-
 		http.Error(rw, fmt.Sprintf("/post/%s", postslug), http.StatusCreated)
 	}
+	forceUpdatePostTitleCache(rw, req)
 	return
 }
 

@@ -178,11 +178,11 @@ func findReccomendations(Incoming *Post) {
 
 	sort.Strings(Candidates)
 
-	if Incoming.R1 != "" {
+	if Incoming.R1 == "" {
 		Incoming.R1 = Candidates[rand.Intn(len(Candidates)-1)]
 	}
 
-	if Incoming.R2 != "" {
+	if Incoming.R2 == "" {
 		Incoming.R2 = Candidates[rand.Intn(len(Candidates)-1)]
 	}
 }

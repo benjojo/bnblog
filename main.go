@@ -21,14 +21,15 @@ var PostTemplate = template.Must(template.ParseFiles("public2/pagetempl.html"))
 var HomeTemplate = template.Must(template.ParseFiles("public2/hometempl.html"))
 
 type Post struct {
-	Author  string
-	Content string `datastore:",noindex"`
-	Date    time.Time
-	Slug    string
-	Title   string
-	Type    string // Possible types [Comedy,Hardware,Mystery,Networking,Problem,Quirk]
-	R1      string // Override of the Rec 1
-	R2      string // Override of the Rec 2
+	Author       string
+	Content      string `datastore:",noindex"`
+	Date         time.Time
+	Slug         string
+	Title        string
+	Type         string // Possible types [Comedy,Hardware,Mystery,Networking,Problem,Quirk]
+	R1           string // Override of the Rec 1
+	R2           string // Override of the Rec 2
+	FeatureImage string
 }
 
 type PostFormatted struct {
@@ -127,11 +128,22 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		RandomLink         string
 		RandomTitle        string
 		RandomYear         int
+		// Twitter card stuff
+		HasFeatureImage bool
+		PageURL         string
+		FeatureImage    string
 	}{
 		Title:   lines[0],
 		Content: string(output),
 		Date:    post.Date.Format("Jan 2 2006"),
 	}
+	layoutData.PageURL = "https://blog.benjojo.co.uk/post/" + post.Slug
+
+	if post.FeatureImage != "" {
+		layoutData.HasFeatureImage = true
+		layoutData.FeatureImage = "https://blog.benjojo.co.uk/asset/" + post.FeatureImage
+	}
+
 	if post.R1 != "" && post.R2 != "" {
 		layoutData.HasReccomendations = true
 		layoutData.FirstRecLink = "/post/" + post.R1

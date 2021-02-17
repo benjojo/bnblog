@@ -44,14 +44,15 @@ func PublishPost(rw http.ResponseWriter, req *http.Request, params martini.Param
 	}
 
 	NP := Post{
-		Author:  "Benjojo",
-		Content: base64.StdEncoding.EncodeToString([]byte(req.PostFormValue("post"))),
-		Date:    postdate,
-		Slug:    postslug,
-		Title:   strings.Split(req.PostFormValue("post"), "\n")[0],
-		Type:    req.PostFormValue("cata"),
-		R1:      req.PostFormValue("R1"),
-		R2:      req.PostFormValue("R2"),
+		Author:       "Benjojo",
+		Content:      base64.StdEncoding.EncodeToString([]byte(req.PostFormValue("post"))),
+		Date:         postdate,
+		Slug:         postslug,
+		Title:        strings.Split(req.PostFormValue("post"), "\n")[0],
+		Type:         req.PostFormValue("cata"),
+		R1:           req.PostFormValue("R1"),
+		R2:           req.PostFormValue("R2"),
+		FeatureImage: req.PostFormValue("featureimage"),
 	}
 	_, err = datastore.Put(c, k, &NP)
 	if err != nil {

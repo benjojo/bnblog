@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/main.css?2022" rel="stylesheet" type="text/css">
     <title>{{.Title}}</title>
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@benjojo12" />
+    <meta name="twitter:creator" content="@benjojo12" />
+    {{if .HasFeatureImage}}
+    <meta property="og:url" content="{{.PageURL}}" />
+    <meta property="og:title" content="{{.Title}}" />
+    <meta property="og:image" content="{{.FeatureImage}}" />
+    {{end}}
 </head>
 <center>
 <body style= "background-color: #FFF">

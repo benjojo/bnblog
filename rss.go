@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/feeds"
+	"github.com/russross/blackfriday"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
@@ -46,10 +47,16 @@ func GetRSS(rw http.ResponseWriter, req *http.Request) {
 			// }
 			// FormattedPosts = append(FormattedPosts, newpost)
 			postd, _ := base64.StdEncoding.DecodeString(v.Content)
+			clippedPost := ""
+			if len(postd) > 255 {
+				clippedPost = string(postd[:256])
+			}
+			HTMLoutput := blackfriday.MarkdownCommon([]byte(clippedPost))
+
 			wot := &feeds.Item{
 				Title:       v.Title,
 				Link:        &feeds.Link{Href: fmt.Sprintf("https://blog.benjojo.co.uk/post/%s", v.Slug)},
-				Description: string(postd[:256]),
+				Description: string(HTMLoutput),
 				Author:      &feeds.Author{"ben@benjojo.co.uk", "ben@benjojo.co.uk"},
 				Created:     v.Date,
 				Id:          generateBadUUID(v.Title),

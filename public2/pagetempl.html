@@ -9,6 +9,8 @@
     <meta name="twitter:site" content="@benjojo12" />
     <meta name="twitter:creator" content="@benjojo12" />
     {{if .HasFeatureImage}}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="{{.FeatureImage}}" />
     <meta property="og:url" content="{{.PageURL}}" />
     <meta property="og:title" content="{{.Title}}" />
     <meta property="og:image" content="{{.FeatureImage}}" />

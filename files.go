@@ -24,8 +24,7 @@ func UploadFile(rw http.ResponseWriter, req *http.Request, params martini.Params
 		return
 	}
 
-	if fmt.Sprintf("%s", u) != "ben@benjojo.co.uk" && fmt.Sprintf("%s", u) != "ben@benjojo.com" &&
-		fmt.Sprintf("%s", u) != "bengerbile@gmail.com" { // Dammit google multi account stuff.
+	if !isAuthedToMakeChanges(u) {
 		http.Error(rw, fmt.Sprintf("wat? %s", u), http.StatusForbidden)
 		return
 	}

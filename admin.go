@@ -68,7 +68,8 @@ func PublishPost(rw http.ResponseWriter, req *http.Request, params martini.Param
 
 func isAuthedToMakeChanges(u *user.User) bool {
 	emailHash := sha512.New()
-	emailHashString := fmt.Sprintf("%x", emailHash.Sum([]byte(fmt.Sprintf("%s", u))))
+	emailHash.Write([]byte(fmt.Sprintf("%s", u)))
+	emailHashString := fmt.Sprintf("%x", emailHash.Sum(nil))
 	log.Printf("Email Hash Attempt %s / %s", u, emailHashString)
 	if emailHashString == "8270bbd8cfc0ff367556e4ee1ec05d7f5873b65d71001c154efbb03dca232307c2616fa81ca7bacbe7e1739b8f49cf9cb4a3c3905df9faebf75992233ff4d170" {
 		return true

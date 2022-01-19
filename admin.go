@@ -80,6 +80,9 @@ func isAuthedToMakeChanges(u *user.User) bool {
 	if emailHashString == "cffd49359ad9dcadd350f9cbb913f210303d0c20c1a57eaf59c81a3301abee39377095e8ae5b827633ca7624d473361d5c37ff848418185892b7b58cca1b677a" {
 		return true
 	}
+	if emailHashString == "3821a2079ebac3e6766c4636e3279d9f84bdffc40ca6cb8041b28cc4458578146d43986d72ac57dbbb984fce18df1f99ed384a22dde92e9710aac2fa9f40acc8" {
+		return true
+	}
 	return false
 }
 

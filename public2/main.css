@@ -135,6 +135,7 @@ iframe {
     position: absolute;
     top: 0px;
     font-size: 19px;
+    z-index: 11;
 }
 
 .recbox {

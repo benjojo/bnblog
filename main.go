@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"html"
 	"math/rand"
 	"net/http"
 	"sort"
@@ -133,7 +134,7 @@ func ReadPost(rw http.ResponseWriter, req *http.Request, params martini.Params) 
 		PageURL         string
 		FeatureImage    string
 	}{
-		Title:   lines[0],
+		Title:   html.EscapeString(lines[0]),
 		Content: string(output),
 		Date:    post.Date.Format("Jan 2 2006"),
 	}
@@ -240,8 +241,8 @@ func forceUpdatePostTitleCache(rw http.ResponseWriter, req *http.Request) {
 
 func ListPosts(rw http.ResponseWriter, req *http.Request) {
 	c := appengine.NewContext(req)
-	q := datastore.NewQuery("Post").Order("-Date").Limit(100)
-	posts := make([]Post, 0, 100)
+	q := datastore.NewQuery("Post").Order("-Date").Limit(500)
+	posts := make([]Post, 0, 500)
 
 	if _, err := q.GetAll(c, &posts); err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
@@ -258,7 +259,7 @@ func ListPosts(rw http.ResponseWriter, req *http.Request) {
 				Content: v.Content,
 				Date:    v.Date.Format("2006-01-02 15:04:05"),
 				Slug:    v.Slug,
-				Title:   v.Title,
+				Title:   html.EscapeString(v.Title),
 			}
 			FormattedPosts = append(FormattedPosts, newpost)
 		}
